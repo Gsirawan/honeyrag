@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Go binary (root only)
+/honeyrag
+
+# Config (user should copy from .env.example)
+configs/.env
+
+# LightRAG storage & logs
+services/lightrag/rag_storage/
+services/lightrag/*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
