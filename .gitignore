@@ -12,6 +12,10 @@ configs/.env
 # LightRAG storage & logs
 services/lightrag/rag_storage/
 services/lightrag/*.log
+rag_storage/
+inputs/
+lightrag.log
+logs/
 
 # IDE
 .idea/

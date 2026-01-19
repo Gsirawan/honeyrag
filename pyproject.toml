@@ -1,0 +1,16 @@
+[project]
+name = "honeyrag"
+version = "0.1.0"
+description = "A sweet, fully-integrated local RAG stack"
+requires-python = ">=3.11"
+dependencies = [
+    "lightrag-hku[api]",
+    "agno",
+    "uvicorn",
+    "openai",
+    "vllm",
+    "ollama",
+]
+
+[dependency-groups]
+dev = []

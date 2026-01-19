@@ -17,7 +17,7 @@ One command. Full RAG pipeline. No cloud. No API keys. Just pure local AI goodne
 | Service | Purpose | Port |
 |---------|---------|------|
 | **Ollama** | Embedding generation (nomic-embed-text) | 11434 |
-| **vLLM** | Local LLM inference (Qwen3-8B) | 8000 |
+| **vLLM** | Local LLM inference | 8000 |
 | **LightRAG** | RAG pipeline (chunking, indexing, retrieval) | 9621 |
 | **Agno Agent** | Web UI + Agent framework | 8081 |
 
@@ -29,20 +29,16 @@ All services talk to each other. Upload documents to LightRAG, query through Agn
 
 ### Prerequisites
 
-- **GPU**: NVIDIA with 16GB+ VRAM (RTX 3090, 4080, 4090, etc.)
+- **GPU**: NVIDIA with 8GB+ VRAM
 - **CUDA**: 12.0+
-- **Python**: 3.11+
-- **Go**: 1.22+ (for building the TUI)
+- **Go**: 1.22+
 - **uv**: Python package manager ([install](https://docs.astral.sh/uv/getting-started/installation/))
 
-### Install
+### First Time Setup
 
 ```bash
-# Clone the repo
-git clone https://github.com/maxazure/honeyrag.git
+git clone https://github.com/Gsirawan/honeyrag.git
 cd honeyrag
-
-# Run the setup script
 ./scripts/install.sh
 ```
 
@@ -53,20 +49,20 @@ cd honeyrag
 ```
 
 That's it. The TUI will:
-1. ✅ Check/install Ollama (if not installed)
-2. ✅ Pull embedding model (if not downloaded)
-3. ✅ Start Ollama server
-4. ✅ Start vLLM server (downloads LLM on first run)
+1. ✅ Sync Python dependencies (uv sync)
+2. ✅ Check/install Ollama
+3. ✅ Pull embedding model
+4. ✅ Start vLLM (shows model config)
 5. ✅ Start LightRAG
 6. ✅ Start HoneyRAG Agent
 
-First run takes longer (model downloads). Subsequent runs are fast.
+First run takes longer (model downloads). After that, just `./honeyrag`.
 
 ---
 
 ## What You Get
 
-Once running, you have:
+Once running:
 
 - **http://localhost:8081** — Agent Web UI (chat with your documents)
 - **http://localhost:9621** — LightRAG UI (upload & manage documents)
@@ -87,14 +83,14 @@ Once running, you have:
 Edit `configs/.env` to customize:
 
 ```env
-# Use a different model (must fit in VRAM)
-VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+# Model (adjust for your VRAM)
+VLLM_MODEL=Qwen/Qwen2.5-1.5B-Instruct
 
-# Adjust for your GPU
+# GPU settings
 VLLM_GPU_MEMORY_UTILIZATION=0.8
-VLLM_MAX_MODEL_LEN=8192
+VLLM_MAX_MODEL_LEN=2048
 
-# Change ports if needed
+# Ports
 VLLM_PORT=8000
 LIGHTRAG_PORT=9621
 AGNO_PORT=8081
@@ -104,39 +100,19 @@ AGNO_PORT=8081
 
 | VRAM | Recommended Model | Context |
 |------|-------------------|---------|
-| 8GB | Qwen/Qwen2.5-3B-Instruct | 4096 |
-| 16GB | Qwen/Qwen3-8B | 8192 |
-| 24GB | Qwen/Qwen2.5-14B-Instruct | 8192 |
+| 8GB | Qwen/Qwen2.5-1.5B-Instruct | 2048 |
+| 16GB | Qwen/Qwen2.5-3B-Instruct | 4096 |
+| 24GB | Qwen/Qwen2.5-7B-Instruct | 8192 |
 
 ---
 
-## Project Structure
+## Logs
 
-```
-honeyrag/
-├── cmd/honeyrag/        # Go TUI application
-├── configs/             # Configuration files
-├── services/
-│   ├── lightrag/        # LightRAG service
-│   └── agno/            # Agno agent service
-├── scripts/             # Setup scripts
-└── README.md
-```
-
----
-
-## Building from Source
-
-```bash
-# Install Go dependencies
-go mod tidy
-
-# Build the binary
-go build -o honeyrag ./cmd/honeyrag
-
-# Run it
-./honeyrag
-```
+All service logs are in the `logs/` folder:
+- `logs/ollama.log`
+- `logs/vllm.log`
+- `logs/lightrag.log`
+- `logs/agent.log`
 
 ---
 
@@ -145,7 +121,6 @@ go build -o honeyrag ./cmd/honeyrag
 Press `q` in the TUI, or:
 
 ```bash
-# Stop all HoneyRAG services
 pkill -f "ollama serve"
 pkill -f "vllm serve"
 pkill -f "lightrag-server"
@@ -160,40 +135,10 @@ Because good things are sweet, and this stack just works. 🍯
 
 ---
 
-## Troubleshooting
-
-### vLLM takes forever to start
-First run downloads the model (~16GB for Qwen3-8B). Be patient.
-
-### Out of VRAM
-Edit `configs/.env` and use a smaller model or reduce `VLLM_GPU_MEMORY_UTILIZATION`.
-
-### Port already in use
-Change ports in `configs/.env` or kill the existing process.
-
----
-
-## Contributing
-
-PRs welcome! Please open an issue first to discuss what you'd like to change.
-
----
-
 ## License
 
 MIT License - do whatever you want with it.
 
 ---
 
-## Acknowledgments
-
-Built with:
-- [vLLM](https://github.com/vllm-project/vllm) - Fast LLM inference
-- [Ollama](https://ollama.ai) - Local embeddings
-- [LightRAG](https://github.com/HKUDS/LightRAG) - Simple RAG pipeline
-- [Agno](https://github.com/agno-agi/agno) - Agent framework
-- [Bubble Tea](https://github.com/charmbracelet/bubbletea) - Beautiful TUI
-
----
-
-*Made with 💜 *
+*Made with 💜*
