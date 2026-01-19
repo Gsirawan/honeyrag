@@ -165,13 +165,30 @@ func (m Model) runStep(index int) tea.Cmd {
 }
 
 func (m Model) uvSync(index int) tea.Msg {
-	cmd := exec.Command("uv", "sync")
-	cmd.Dir = m.baseDir
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return stepErrorMsg{index: index, err: fmt.Errorf("uv sync failed: %v\n%s", err, string(output))}
+	// Try with --python flag first to handle systems with multiple Python versions
+	// vLLM requires Python <3.14, so we prefer 3.12 or 3.13
+	pythonVersions := []string{"3.12", "3.13", "3.11", ""}
+
+	var lastErr error
+	var lastOutput []byte
+
+	for _, pyVer := range pythonVersions {
+		var cmd *exec.Cmd
+		if pyVer != "" {
+			cmd = exec.Command("uv", "sync", "--python", pyVer)
+		} else {
+			cmd = exec.Command("uv", "sync")
+		}
+		cmd.Dir = m.baseDir
+		output, err := cmd.CombinedOutput()
+		if err == nil {
+			return stepDoneMsg{index: index}
+		}
+		lastErr = err
+		lastOutput = output
 	}
-	return stepDoneMsg{index: index}
+
+	return stepErrorMsg{index: index, err: fmt.Errorf("uv sync failed: %v\n%s", lastErr, string(lastOutput))}
 }
 
 func (m Model) checkInstallOllama(index int) tea.Msg {
@@ -456,8 +473,9 @@ func (m Model) View() string {
 		b.WriteString("\n")
 
 		if i == 4 && (step.Status == "running" || step.Status == "done") {
-			b.WriteString(configStyle.Render(fmt.Sprintf("    Model: %s | GPU: %s | Context: %s\n",
+			b.WriteString(configStyle.Render(fmt.Sprintf("    Model: %s | GPU: %s | Context: %s",
 				m.config["model"], m.config["gpuUtil"], m.config["maxLen"])))
+			b.WriteString("\n")
 		}
 
 		if len(step.LogLines) > 0 && step.Status == "running" {
