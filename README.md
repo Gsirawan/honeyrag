@@ -8,7 +8,7 @@ One command. Full RAG pipeline. No cloud. No API keys. Just pure local AI goodne
 ![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python)
 
-![HoneyRAG Screenshot](asset/screenshot-20260116-214919.png)
+![HoneyRAG Screenshot](asset/screenshot-20260119-195527.png)
 
 ---
 
