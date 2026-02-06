@@ -398,12 +398,20 @@ func readLastLines(filePath string, n int) string {
 	return strings.Join(lines, "\n")
 }
 
+func (m *Model) cleanup() {
+	exec.Command("pkill", "-f", "ollama serve").Run()
+	exec.Command("pkill", "-f", "vllm serve").Run()
+	exec.Command("pkill", "-f", "lightrag-server").Run()
+	exec.Command("pkill", "-f", "uvicorn app:app").Run()
+}
+
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
+			m.cleanup()
 			return m, tea.Quit
 		}
 
